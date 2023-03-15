@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+ 
+    <param name="robot_description" textfile="$(find arm)/urdf/robot.urdf"/> 
+    
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="gui" value="true" />
+	</include>
+
+	<group ns="conveyor">
+		<node name="spawn_model_belt" pkg="gazebo_ros" type="spawn_model" args="-file $(find demo_world)/urdf/conveyor.urdf -urdf -model conveyor_belt" respawn="false" output="screen" />
+	</group>
+
+	<node name="cube_spawner" pkg="demo_world" type="demo.py" output="screen"/>
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model robot"    />
+
+    <node name="RSP" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
+
+    <rosparam  file="$(find arm)/config/joint_trajectory_controller.yaml"/>
+
+    <node name="Controller_Spawner" pkg="controller_manager" type="spawner" args="arm_controller gripper_controller" />
+
+        
+   
+    
+
+</launch>
