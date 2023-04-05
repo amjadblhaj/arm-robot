@@ -13,13 +13,10 @@
 
 	<node name="cube_spawner" pkg="demo_world" type="demo.py" output="screen"/>
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model robot"    />
-
-    <node name="RSP" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
-
     <rosparam  file="$(find arm)/config/joint_trajectory_controller.yaml"/>
 
-    <node name="Controller_Spawner" pkg="controller_manager" type="spawner" args="arm_controller gripper_controller" />
-
+    <node name="Controller_Spawner" pkg="controller_manager" type="spawner" args="arm_controller gripper_controller " />
+    <node name="arm2" pkg="arm" type="arm2.py" output="screen"/>
         
    
     
