@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<robot name="robot2">  
+<robot name="robot"> 
+
   <link name="world"/>
        
 <link name="base_link">
@@ -231,6 +232,8 @@
     <axis xyz="0 0 -1"/>
     <limit lower="0.0" upper="0.395" velocity="0.5" effort="1000.0"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
+    <dynamics damping="2.0" friction="0.0"/>
+    <dynamics damping="2.0" friction="0.0"/>
 </joint>
 
 <link name="link_5">
@@ -296,6 +299,9 @@
     <axis xyz="1 0 0"/>
     <limit lower="0" upper="0.09" velocity="0.5" effort="1000.0"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
+     <dynamics damping="2.0" friction="0.0"/>
+     <dynamics damping="2.0" friction="0.0"/>
+
 </joint>
 
 <link name="link_7">
@@ -327,9 +333,102 @@
     <parent link="link_5"/>
     <child link="link_7"/>
     <axis xyz="-1 0 0"/>
-    <limit lower="0" upper="0.09" velocity="0.5" effort="1000.0"/>
+    <limit lower="0" upper="0.09" velocity="0.5" effort="1000.0" />
     <origin xyz="0 0 0" rpy="0 0 0"/>
+    <dynamics damping="0.5" friction="0.0"/>
+       
+      
 </joint>
+
+  <joint name="camera_joint" type="fixed">
+        <parent link="world"/>
+        <child link="camera_link"/>
+        <origin xyz="0 0 2.2" rpy="0 1.57 0"/>
+    </joint>
+
+    <link name="camera_link">
+        <inertial>
+         <origin xyz="0 0 0.0"/>
+         <mass value="0.25"/>
+         <inertia ixx="0.000375" ixy="0.0" ixz="0.0" iyz="0.0"  iyy="0.00031875" izz="0.00009375"/>
+        </inertial>
+
+        <visual>
+         <origin xyz="0 0 0.0"/> 
+            <geometry>
+                <box size="0.05 0.05 0.05" />
+            </geometry>
+            <material name="silver">
+            <color rgba="1.0 0 0.0 0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.0"/>
+            <geometry>
+                 <box size="0.05 0.05 0.05"/>
+            </geometry>
+            <material name="silver">
+            <color rgba="1.0 0 0.0 0"/>
+            </material>
+        </collision>
+    </link>
+
+
+    <joint name="camera_optical_joint" type="fixed">
+        <parent link="camera_link"/>
+        <child link="camera_link_optical"/>
+        <origin xyz="0 0 0" rpy="1.57 0 1.57"/>
+    </joint>
+
+    <link name="camera_link_optical"></link>
+
+
+
+    <gazebo reference="camera_link">
+        <material>Gazebo/silver</material>
+
+        <sensor name="camera" type="camera">
+            <pose> 0 0 0 0 0 0 </pose>
+            <visualize>true</visualize>
+            <update_rate>5</update_rate>
+            <camera>
+                <horizontal_fov>1.089</horizontal_fov>
+                <image>
+                    <format>R8G8B8</format>
+                    <width>420</width>
+                    <height>420</height>
+                </image>
+                <clip>
+                    <near>0.05</near>
+                    <far>1.5</far>
+                </clip>
+                     <noise>
+                      <type>gaussian</type>
+                        <!-- Noise is sampled independently per pixel on each frame.
+                          That pixel's noise value is added to each of its color
+                          channels, which at that point lie in the range [0,1]. -->
+                     <mean>0.0</mean>
+                     <stddev>0.007</stddev>
+                    </noise>
+            </camera>
+            <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                 <alwaysOn>true</alwaysOn>
+                 <updateRate>0.0</updateRate>
+                 <cameraName>robot/camera1</cameraName>
+                 <imageTopicName>image_raw</imageTopicName>
+                 <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+                 <frame_name>camera_link_optical</frame_name>
+                 <hackBaseline>0.07</hackBaseline>
+                 <distortionK1>0.0</distortionK1>
+                 <distortionK2>0.0</distortionK2>
+                 <distortionK3>0.0</distortionK3>
+                   <distortionT1>0.0</distortionT1>
+                 <distortionT2>0.0</distortionT2>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+
 
 
 <transmission name ="trans_1">
@@ -407,11 +506,28 @@
         <mechanicalReduction>1</mechanicalReduction>
     </actuator>
 </transmission>
+<gazebo>
+    <plugin name="gazebo_grasp_fix" filename="libgazebo_grasp_fix.so">
+       <arm>
+         <arm_name>robot</arm_name>
+         <palm_link>link_4</palm_link>
+         <gripper_link>link_6</gripper_link>
+         <gripper_link>link_7</gripper_link>
+        </arm>
+       <forces_angle_tolerance>100</forces_angle_tolerance>
+       <update_rate>10</update_rate>
+       <grip_count_threshold>3</grip_count_threshold>
+       <max_grip_count>10</max_grip_count>
+       <release_tolerance>0.001</release_tolerance>
+       <disable_collisions_on_attach>false</disable_collisions_on_attach>
+       <contact_topic>__default_topic__</contact_topic>
+    </plugin>
+</gazebo>
 
 <gazebo>
     <plugin name="control" filename="libgazebo_ros_control.so"/>
 </gazebo>
- 
+
 
 
 
